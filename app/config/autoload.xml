@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ae:configurations xmlns="http://agavi.org/agavi/config/parts/autoload/1.0" xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0" parent="%core.system_config_dir%/autoload.xml">
+	<ae:configuration>
+		
+		<autoload name="PullHubBaseAction">%core.lib_dir%/action/PullHubBaseAction.class.php</autoload>
+		<autoload name="PullHubBaseModel">%core.lib_dir%/model/PullHubBaseModel.class.php</autoload>
+		<autoload name="PullHubBaseView">%core.lib_dir%/view/PullHubBaseView.class.php</autoload>
+		
+	</ae:configuration>
+</ae:configurations>
