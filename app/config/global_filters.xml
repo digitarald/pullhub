@@ -27,6 +27,9 @@
 					errors that yield no match and those that have no corresponding field are inserted using rules defined in "error_messages".
 				-->
 				
+				<ae:parameter name="error_class_map">parent::${htmlnsPrefix}*</ae:parameter>
+				<ae:parameter name="error_class">error-label</ae:parameter>
+				
 				<!--
 					for all field error messages.
 				-->
@@ -80,6 +83,24 @@
 			</filter> -->
 
 		</filters>
+
+	</ae:configuration>
+
+
+	<ae:configuration environment="development.*">
+	 
+		<!-- FirePHP output -->
+		<filter name="AdtDebugFirePhpFilter" class="AdtDebugFirePhpFilter" enabled="true">
+	 
+			<ae:parameter name="datasources">
+	 
+				<!-- Simple action execution timer-->
+				<ae:parameter>
+					<ae:parameter name="class">AdtActionTimerDataSource</ae:parameter>
+				</ae:parameter>
+			</ae:parameter>
+	 
+		</filter>
 
 	</ae:configuration>
 

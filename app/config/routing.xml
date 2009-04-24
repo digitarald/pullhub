@@ -6,13 +6,10 @@
 			<route name="index" pattern="^/$" module="%actions.default_module%" action="%actions.default_action%" />
 			
 			<route name="hub" pattern="^/hub" module="Hub">
-				<route name=".index" pattern="^$" action="Index" />
-				<route name=".package" pattern="^(user:\w+)/(repo:\w+)" action="Package">
+				<route name=".index" pattern="^(/{user:[\w-]+})?$" action="Index" />
+				<route name=".package" pattern="^/(user:[\w-]+)/(repo:[\w-]+)(/{tree:\w[.\w-]+})?(/{path:\w[/.\w-]+})?" action="Package">
 					<route name=".view" pattern="^$" action=".View" />
-					<route name=".pull" pattern="^.pull$" action=".Pull" />
 				</route>
-				
-				<route name=".pull" pattern="^.pull$" action="Pull" />
 			</route>
 		</routes>
 	</ae:configuration>

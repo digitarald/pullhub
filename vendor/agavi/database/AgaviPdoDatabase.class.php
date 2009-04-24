@@ -62,7 +62,7 @@ class AgaviPdoDatabase extends AgaviDatabase
 		}
 
 		try {
-			$username = $this->getParameter('username');
+			$username = $this->getParameter('owner');
 			$password = $this->getParameter('password');
 
 			$options = array();

@@ -6,7 +6,24 @@
 >
 	<ae:configuration>
 		
-		<validators>
+		<validators method="read">
+		
+			<validator class="isset">
+				<argument>user</argument>
+			</validator>
+			
+			<validator class="isset">
+				<argument>repo</argument>
+			</validator>
+			
+			<validator class="isset" required="false">
+				<argument>tree</argument>
+			</validator>
+			
+			<validator class="isset" required="false">
+				<argument>path</argument>
+			</validator>
+			
 		</validators>
 		
 	</ae:configuration>

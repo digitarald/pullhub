@@ -2,6 +2,26 @@
 <ae:configurations xmlns="http://agavi.org/agavi/config/parts/autoload/1.0" xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0" parent="%core.system_config_dir%/autoload.xml">
 	<ae:configuration>
 		
+		<!-- Vendor -->
+		<autoload name="MarkdownExtra_Parser">%core.vendor_dir%/markdown/markdown.php</autoload>
+		<autoload name="SmartyPants">%core.vendor_dir%/markdown/smartypants.php</autoload>
+			
+		<autoload name="AdtDebugFilter">%core.vendor_dir%/adt/filter/AdtDebugFilter.class.php</autoload>
+	 
+		<autoload name="AdtDebugToolbarFilter">%core.vendor_dir%/adt/filter/AdtDebugToolbarFilter.class.php</autoload>
+	 
+		<autoload name="AdtDebugFilter">%core.vendor_dir%/adt/filter/AdtDebugFilter.class.php</autoload>
+		<autoload name="AdtDebugFirePhpFilter">%core.vendor_dir%/adt/filter/AdtDebugFirePhpFilter.class.php</autoload>
+		<autoload name="AdtFirePhp">%core.vendor_dir%/adt/firephp/AdtFirePhp.class.php</autoload>
+		<autoload name="FirePHP">%core.vendor_dir%/adt/vendor/FirePHPCore/FirePHP.class.php</autoload>
+		
+		<autoload name="AdtDebugFilterDataSource">%core.vendor_dir%/adt/datasource/AdtDebugFilterDataSource.class.php</autoload>
+		<autoload name="AdtActionTimerDataSource">%core.vendor_dir%/adt/extras/AdtActionTimerDataSource.class.php</autoload>
+		
+		<autoload name="sfYaml">%core.vendor_dir%/agavi/vendor/PHPUnit/Util/YAML/sfYaml.class.php</autoload>
+		
+		
+		<!-- Libs -->
 		<autoload name="PullHubBaseAction">%core.lib_dir%/action/PullHubBaseAction.class.php</autoload>
 		<autoload name="PullHubBaseModel">%core.lib_dir%/model/PullHubBaseModel.class.php</autoload>
 		<autoload name="PullHubBaseView">%core.lib_dir%/view/PullHubBaseView.class.php</autoload>

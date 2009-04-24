@@ -14,15 +14,12 @@ class AdtDebugToolbarFilter extends AdtDebugFilter implements AgaviIActionFilter
 
 	public function render(AgaviExecutionContainer $container)
 	{
-		// Check if we can inject AgaviDebugToolbar to the response
-		// and if output type is one of our defined output types
-		if ( !$container->getResponse()->isContentMutable() ||
-		(is_array($this->getParameter('output_types')) &&
-		!in_array($container->getResponse()->getOutputType()->getName(), $this->getParameter('output_types')) ) ) {
+		if (!$this->isAllowedOutputType($container)) {
 			return;
 		}
 		
-		$template = $this->log;
+		$template = $this->rq->getAttributeNamespace(AdtDebugFilter::NS_DATA);
+		$template['datasources'] = $this->rq->getAttribute('datasources', AdtDebugFilter::NS, array());
 
 		// TODO: handle relative and absolute paths
 		ob_start();

@@ -47,12 +47,7 @@
 			<setting name="use_security">true</setting>
 			<setting name="use_translation">false</setting>
 			
-			<!-- now try to include a custom settings.xml with more infos -->
-			<!-- we only grab all <setting> elements in there -->
-			<xi:include href="%core.custom_dir%/config/settings.xml" xpointer="xmlns(a=http://agavi.org/agavi/1.0/config) xpointer(/a:settings/*)">
-				<xi:fallback />
-			</xi:include>
-			
+			<setting name="site_name">PullHub</setting>
 		</settings>
 
 		<exception_templates>
@@ -68,7 +63,7 @@
 
 	<ae:configuration environment="development.*">
 		<settings>
-			<setting name="debug">true</setting>
+			<setting name="debug">false</setting>
 		</settings>
 	</ae:configuration>
 

@@ -72,7 +72,7 @@ class AgaviPostgresqlDatabase extends AgaviDatabase
 				$host     = $this->getParameter('host');
 				$password = $this->getParameter('password');
 				$port     = $this->getParameter('port');
-				$user     = $this->getParameter('username');
+				$user     = $this->getParameter('owner');
 				// construct connection string
 				$string = (($database != null) ? (' dbname='   . $database) : '') .
 									(($host != null)     ? (' host='     . $host)     : '') .
@@ -141,7 +141,7 @@ class AgaviPostgresqlDatabase extends AgaviDatabase
 		$host     = $this->getParameter('host');
 		$password = $this->getParameter('password');
 		$port     = $this->getParameter('port');
-		$user     = $this->getParameter('username');
+		$user     = $this->getParameter('owner');
 
 		// construct connection string
 		$string = (($database != null) ? (' dbname='   . $array[$database]) : '') .

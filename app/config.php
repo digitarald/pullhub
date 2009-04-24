@@ -1,26 +1,7 @@
 <?php
 
-// +---------------------------------------------------------------------------+
-// | Should we run the system in debug mode? When this is on, there may be     |
-// | various side-effects. But for the time being it only deletes the cache    |
-// | upon start-up.                                                            |
-// |                                                                           |
-// | This should stay on while you're developing your application, because     |
-// | many errors can stem from the fact that you're using an old cache file.   |
-// |                                                                           |
-// | This constant will be auto-set by Agavi if you do not supply it.          |
-// | The default value is: <false>                                             |
-// +---------------------------------------------------------------------------+
-// AgaviConfig::set('core.debug', true);
-
-// +---------------------------------------------------------------------------+
-// | An absolute filesystem path to the agavi package. This directory          |
-// | contains all the Agavi packages.                                          |
-// |                                                                           |
-// | This constant will be auto-set by Agavi if you do not supply it.          |
-// | The default value is the name of the directory "agavi.php" resides in.    |
-// +---------------------------------------------------------------------------+
-// AgaviConfig::set('core.agavi_dir', 'C:\xampp\htdocs\pullhub\vendor\agavi');
+// let's make a generic project dir setting
+AgaviConfig::set('core.project_dir', realpath(dirname(__FILE__) . '/../'));
 
 // +---------------------------------------------------------------------------+
 // | An absolute filesystem path to your web application directory. This       |
@@ -29,20 +10,7 @@
 // | You shouldn't have to change this usually since it's auto-determined.     |
 // | Agavi can't determine this automatically, so you always have to supply it.|
 // +---------------------------------------------------------------------------+
-AgaviConfig::set('core.app_dir', dirname(__FILE__));
-
-// +---------------------------------------------------------------------------+
-// | An absolute filesystem path to the directory where cache files will be    |
-// | stored.                                                                   |
-// |                                                                           |
-// | NOTE: If you're going to use a public temp directory, make sure this is a |
-// |       sub-directory of the temp directory. The cache system will attempt  |
-// |       to clean up *ALL* data in this directory.                           |
-// |                                                                           |
-// | This constant will be auto-set by Agavi if you do not supply it.          |
-// | The default value is: "<core.app_dir>/cache"                              |
-// +---------------------------------------------------------------------------+
-// AgaviConfig::set('core.cache_dir', AgaviConfig::get('core.app_dir') . '/cache');
+AgaviConfig::set('core.app_dir', AgaviConfig::get('core.project_dir') . '/app');
 
 // +---------------------------------------------------------------------------+
 // | You may also modify the following other directives in this file:          |
@@ -58,6 +26,17 @@ AgaviConfig::set('core.custom_dir', AgaviConfig::get('core.project_dir') . '/cus
 // holds the 3rd party libraries
 AgaviConfig::set('core.vendor_dir', AgaviConfig::get('core.project_dir') . '/vendor');
 
+
+AgaviConfig::set('hub.user_alias', array(
+	'self' => AgaviConfig::get('core.project_dir') . '/repos'
+));
+
+AgaviConfig::set('hub.package_alias', array(
+	'core' => 'mootools/mootools-core',
+	'more' => 'mootools/mootools-more'
+));
+
+
 // Report all errors during development
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
@@ -71,6 +50,7 @@ function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 	}
 }
 set_error_handler('errorHandler');
+
 
 ini_set('session.use_trans_sid', '0');
 

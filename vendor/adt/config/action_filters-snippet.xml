@@ -4,6 +4,8 @@
 	Copy and paste this into your app/config/action_filters.xml
 	or use XInclude (like the demo app)
 -->
+
+	<!-- HTML output -->
 	<filter name="AdtDebugToolbarFilter" class="AdtDebugToolbarFilter">
 		<!-- AdtDebugFilter -->
 		<!-- not implemented yet -->
@@ -36,9 +38,20 @@
 			<parameter>js/SimpleTabs.js</parameter>
 			<parameter>js/AgaviDebugToolbar.js</parameter>
 		</parameter>
+		<parameter name="datasources">
+			<parameter>SampleDataSource</parameter>
+		</parameter>
 	</filter>
 	
-	<!-- Requires FirePHP -->
-	<!-- filter name="AdtDebugFirePhpFilter" class="AdtDebugFirePhpFilter" /-->
+	<!-- FirePHP output -->
+	<filter name="AdtDebugFirePhpFilter" class="AdtDebugFirePhpFilter" >
+		<parameter name="datasources">
+			<parameter>
+				<parameter name="class">AdtPropelDataSource</parameter>
+				<parameter name="parameters">
+				</parameter>
+			</parameter>
+		</parameter>
+	</filter>
 
 </filters>

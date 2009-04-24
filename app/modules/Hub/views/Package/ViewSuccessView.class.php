@@ -6,7 +6,9 @@ class Hub_Package_ViewSuccessView extends PullHubHubBaseView
 	{
 		$this->setupHtml($rd);
 
-		$this->setAttribute('_title', 'Package.View');
+		$repo = $this->getAttribute('repo');
+
+		$this->setAttribute('_title', $repo['owner'] . '’ ' . $repo['name']);
 	}
 }
 

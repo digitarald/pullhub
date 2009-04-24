@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ae:configurations xmlns:ae="http://agavi.org/agavi/config/global/envelope/1.0" xmlns="http://agavi.org/agavi/config/parts/output_types/1.0">
-	
+		
 	<ae:configuration>
 		
 		<output_types default="html">
@@ -19,7 +19,9 @@
 						</ae:parameter>
 						<ae:parameter name="default_extension">.php</ae:parameter>
 						<!-- this changes the name of the variable with all template attributes from the default $template to $t -->
-						<ae:parameter name="var_name">t</ae:parameter>
+						<ae:parameter name="extract_vars">true</ae:parameter>
+						<ae:parameter name="extract_slots">false</ae:parameter>
+						<ae:parameter name="slots_var_name">slot</ae:parameter>
 					</renderer>
 				</renderers>
 				
@@ -48,8 +50,6 @@
 						<layer name="decorator">
 							<ae:parameter name="directory">%core.template_dir%</ae:parameter>
 							<ae:parameter name="template">Master</ae:parameter>
-							<!-- an example for a slot -->
-							<slot name="nav" module="Default" action="Widgets.Navigation" />
 						</layer>
 					</layout>
 					

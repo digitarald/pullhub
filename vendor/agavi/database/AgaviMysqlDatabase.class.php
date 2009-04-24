@@ -67,7 +67,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 				$database = $this->getParameter('database');
 				$host     = $this->getParameter('host', 'localhost');
 				$password = $this->getParameter('password');
-				$user     = $this->getParameter('username');
+				$user     = $this->getParameter('owner');
 				break;
 
 			case 'server':
@@ -148,7 +148,7 @@ class AgaviMysqlDatabase extends AgaviDatabase
 	protected function loadParameters(array $array)
 	{
 		// list of available parameters
-		$available = array('database', 'host', 'password', 'username');
+		$available = array('database', 'host', 'password', 'owner');
 
 		$parameters = array();
 

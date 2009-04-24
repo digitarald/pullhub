@@ -8,105 +8,112 @@
  * @copyright  Authors
  * @version    $Id$
  */
-abstract class AdtDebugFilter extends AgaviFilter implements AgaviIActionFilter
+abstract class AdtDebugFilter extends AgaviFilter implements AgaviIActionFilter, AgaviIGlobalFilter
 {
-	protected $log = array();
+	const NS = 'adt.debugfilter';
+	const NS_DATA = 'adt.debugfilter.data';
+
+	/**
+	 * @var        AgaviRequest
+	 */
+	protected $rq;
 
 	protected $options = array();
 
-	protected $sources = array();
+	protected $datasources = array();
 
 	public function initialize(AgaviContext $context, array $parameters = array())
 	{
 		parent::initialize($context, $parameters);
+		$this->rq = $context->getRequest();
 
-		$this->options = array_merge(
-			//default options
-			array(
-				'sections' => array(
-					'routing',
-					'globalrd',
-					'actions',
-					'fpf',
-					'translation',
-					'environment',
-					'log'
-				),
+		//merge default options, earlier set options and parameters from the xml config.
+		$defaultOptions = array(
+			'sections' => array(
+				'routing',
+				'globalrd',
+				'actions',
+				'translation',
+				'environment',
+				'log'
 			),
+		);
+		$options = array_merge(
+			$defaultOptions,
+			$this->rq->getAttribute('options', self::NS, array()),
 			$this->getParameters()
 		);
-	}
+		$this->rq->setAttribute('options', $options, self::NS);
 
-	protected function getSources()
-	{
-		$params = $this->getParameter('sources', array());
+		//external data sources
+		foreach($this->getParameter('datasources', array()) as $datasource) {
+			$ds = new $datasource['class'];
 
-		foreach ($params as $cls) {
-			$instance = new $cls();
-			$instance->initialize($this->context);
-			$this->sources[] = $instance;
+			$ds->initialize($context, (isset($datasource['parameters']) && is_array($datasource['parameters']) ? $datasource['parameters'] : array()));
+			$this->rq->appendAttribute('datasources', $ds, self::NS);
 		}
 	}
 
-	protected function updateOptions()
+	/**
+	 * Checks if it is ok to inject debug output into the response
+	 *
+	 * @param      AgaviExecutionContainer $container
+	 * @return     boolean
+	 */
+	protected function isAllowedOutputType(AgaviExecutionContainer $container)
 	{
-		$req = $this->context->getRequest();
-		$runtimeOptions = $req->hasAttributeNamespace('adt.debugfilter.options') ?
-			$req->getAttributeNamespace('adt.debugfilter.options') : array();
-		$this->options = array_merge(
-			$this->options,
-			$runtimeOptions
-		);
+		$outputTypes = $this->rq->getAttribute('options[output_types]', AdtDebugFilter::NS);
+		$currentOutputType = $container->getResponse()->getOutputType()->getName();
+		return $container->getResponse()->isContentMutable() && (!is_array($outputTypes) || in_array($currentOutputType, $outputTypes) );
 	}
 
 	public function executeOnce(AgaviFilterChain $filterChain, AgaviExecutionContainer $container)
 	{
-		$con = $this->context->getDatabaseConnection();
-		$profiler = new Doctrine_Connection_Profiler();
-		$con->setListener($profiler);
+		//trigger datasource event listeners
+		foreach($this->rq->getAttribute('datasources', self::NS, array()) as $ds) {
+			$ds->beforeExecuteOnce($container);
+		}
 
-		//procede to execute
-		$this->execute($filterChain, $container);
+		//procede to in the chain
+		$filterChain->execute($container);
+
+		//trigger datasource event listeners
+		foreach($this->rq->getAttribute('datasources', self::NS, array()) as $ds) {
+			$ds->afterExecuteOnce($container);
+		}
 
 		//log global (i.e. not per action) stuff
-		$this->log['routes'] = $this->getMatchedRoutes();
-		$this->log['request_data'] = array(
+		$this->rq->setAttribute('routes', $this->getMatchedRoutes(), self::NS_DATA);
+		$this->rq->setAttribute('request_data', array(
 			'request_parameters' => $this->getContext()->getRequest()->getRequestData()->getParameters(),
 			'cookies' => $this->getContext()->getRequest()->getRequestData()->getCookies(),
 			'headers' => $this->getContext()->getRequest()->getRequestData()->getHeaders()
-		);
-		$this->log['log'] = $this->getLogLines();
-		$this->log['database'] = $this->getDatabase();
-		$this->log['tm'] = $this->getContext()->getTranslationManager();
-		$this->log['environments'] = $this->getAvailableEnvironments();
+			), self::NS_DATA);
 
-		$queries = array();
-		$time = 0;
-		foreach ($profiler as $event) {
-			$sec = $event->getElapsedSecs();
-			$time += $sec;
-			$name = $event->getName();
-			if ($name == 'execute' || $name == 'query') {
-				$queries[] = array(round($sec, 6), $event->getQuery(), $event->getParams());
-			}
-		}
-		$this->log['queries'] = array(
-			'total' => round($time, 6),
-			'table' => $queries
-		);
+		$this->rq->setAttribute('tm', $this->getContext()->getTranslationManager(), self::NS_DATA);
+//		$this->log['environments'] = $this->getAvailableEnvironments();
 
 		$this->render($container);
 	}
 
 	public function execute(AgaviFilterChain $filterChain, AgaviExecutionContainer $container)
 	{
+		//trigger datasource event listeners
+		foreach($this->rq->getAttribute('datasources', self::NS, array()) as $ds) {
+			$ds->beforeExecute($container);
+		}
+
 		//procede with execution
+//		throw new Exception(__METHOD__);
 		$filterChain->execute($container);
 
-		$this->updateOptions();
+		//trigger datasource event listeners
+		foreach($this->rq->getAttribute('datasources', self::NS, array()) as $ds) {
+			$ds->afterExecute($container);
+		}
 
 		//now the action has been executed and we'll log what can be logged
-		if(in_array('actions', $this->options['sections'])) {
+		if(true) { //FIXME: options: in_array('actions', $this->options['sections'])) {
 			$this->log($container);
 		}
 	}
@@ -116,7 +123,7 @@ abstract class AdtDebugFilter extends AgaviFilter implements AgaviIActionFilter
 	protected function log(AgaviExecutionContainer $container)
 	{
 		//keep this simple for now
-		$this->log['actions'][] = array (
+		$this->rq->appendAttribute('actions', array (
 			'name' => $container->getActionName(),
 			'module' => $container->getModuleName(),
 			'request_data' => array(
@@ -126,7 +133,7 @@ abstract class AdtDebugFilter extends AgaviFilter implements AgaviIActionFilter
 			),
 			'validation' => $this->getValidationInfo($container),
 			'view' => $this->getViewInfo($container),
-		);
+		), self::NS_DATA);
 	}
 
 	/**
@@ -189,10 +196,10 @@ abstract class AdtDebugFilter extends AgaviFilter implements AgaviIActionFilter
 		return $result;
 	}
 
-	public function getLogLines()
-	{
-		return $this->context->getRequest()->getAttribute('log', 'adt.debugtoolbar', array());
-	}
+//	public function getLogLines()
+//	{
+//		return $this->context->getRequest()->getAttribute('log', 'adt.debugtoolbar', array());
+//	}
 
 	private function getValidationInfo(AgaviExecutionContainer $container)
 	{
@@ -201,6 +208,7 @@ abstract class AdtDebugFilter extends AgaviFilter implements AgaviIActionFilter
 
 		$result['has_errors'] = $vm->hasErrors();
 		$result['severities'] = array(
+			100 => 'INFO',
 			200 => 'SILENT',
 			300 => 'NOTICE',
 			400 => 'ERROR',

@@ -1,0 +1,96 @@
+/* structure */
+
+html {
+	overflow: scroll;
+}
+
+.hide {
+	display: none;
+}
+
+#repos {
+	list-style: none;
+	margin: 0;
+}
+
+#tree,
+#tree ul {
+	list-style: none;
+	margin: 0;
+}
+
+#tree label {
+	font-weight: normal;
+	cursor: pointer;
+}
+
+#tree ul {
+	margin-left: 1.5em;
+}
+
+/* theme */
+
+a {
+	padding: 1px;
+}
+
+a:link, a:visited {
+	color:#039;
+}
+
+a:hover {
+	background-color: #30c;
+	color: #fff;
+	text-decoration: none;
+}
+
+h1 a:link, h1 a:visited,
+h2 a:link, h2 a:visited,
+h3 a:link, h3 a:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover {
+	color: #fff;
+}
+
+#header {
+	border-bottom: 1px solid #ddd;
+}
+#header h1, #header h2 {
+	line-height: 60px;
+}
+
+#tree .nature-source .title {
+	color: #8b0000;
+}
+#tree .nature-docs .title {
+	color: #696969;
+}
+#tree .nature-assets .title {
+	color: #808000;
+}
+#tree .nature-specs .title,
+#tree .nature-demos .title {
+	color: #4682b4;
+}
+#tree .nature-compatibility .title {
+	color: #a9a9a9;
+}
+
+#footer {
+	margin-top: 1.45em;
+	padding: 1.45em 0;
+	border-top: 1px solid #ddd;
+}
+
+.checked .title {
+	font-weight: bold;
+}
+
+#footer .container {
+	text-align: center;
+}

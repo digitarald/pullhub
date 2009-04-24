@@ -152,8 +152,8 @@ class Extensions_SeleniumTestCaseTest extends PHPUnit_Extensions_SeleniumTestCas
     public function testType()
     {
         $this->open($this->url . 'html/test_type_page1.html');
-        $this->type('username', 'TestUser');
-        $this->assertEquals('TestUser', $this->getValue('username'));
+        $this->type('owner', 'TestUser');
+        $this->assertEquals('TestUser', $this->getValue('owner'));
         $this->type('password', 'testUserPassword');
         $this->assertEquals('testUserPassword', $this->getValue('password'));
 

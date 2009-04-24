@@ -76,7 +76,7 @@ class AgaviAdodbDatabase extends AgaviDatabase
 					$host 	  = $this->getParameter('host', null);
 					$password = $this->getParameter('password', null);
 					$dbtype   = $this->getParameter('dbtype', null);
-					$username = $this->getParameter('username', '');
+					$username = $this->getParameter('owner', '');
 					break;
 
 				case 'dsn':

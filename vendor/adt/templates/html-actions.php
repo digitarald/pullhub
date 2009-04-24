@@ -22,7 +22,7 @@
 			<?php foreach($action['validation']['incidents'] as $incident): /* @var $incident AgaviValidationIncident */ ?>
 			<dl>
 				<dt>Validator:</dt>
-				<dd><?php echo $incident->getValidator()->getName() ?></dd>
+				<dd><?php echo $incident->getValidator() ? htmlspecialchars($incident->getValidator()->getName()) : '(no validator)'; ?></dd>
 				<dt>Severity:</dt>
 				<dd><?php echo $action['validation']['severities'][$incident->getSeverity()] ?></dd>							
 				<dt>Field(s):</dt>

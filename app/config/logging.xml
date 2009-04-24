@@ -5,13 +5,12 @@
 
 		<loggers default="default">
 
-			<!-- logs only DEBUG messages -->
 			<logger name="debug" class="AgaviLogger" level="AgaviLogger::DEBUG">
 				<appenders>
-					<appender>DebugLogAppender</appender>
+				  <appender>AdtRequestLogAppender</appender>
 				</appenders>
 			</logger>
-
+			
 			<!-- logs only INFO messages -->
 			<logger name="default" class="AgaviLogger" level="AgaviLogger::INFO">
 				<appenders>
@@ -28,6 +27,8 @@
 			</logger>
 		</loggers>
 		<appenders>
+
+			<appender name="AdtRequestLogAppender" class="AdtRequestLogAppender" layout="PassthruLayout" />
 
 			<!--
 				Debug logs are rotated in a 7 day (AgaviRotatingFileLoggerAppender default) cycle

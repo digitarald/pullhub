@@ -67,7 +67,7 @@ class AgaviMysqliDatabase extends AgaviMysqlDatabase
 				$database = $this->getParameter('database');
 				$host     = $this->getParameter('host', 'localhost');
 				$password = $this->getParameter('password');
-				$user     = $this->getParameter('username');
+				$user     = $this->getParameter('owner');
 				break;
 
 			case 'server':

@@ -2,6 +2,29 @@
 
 class Hub_Package_ViewAction extends PullHubHubBaseAction
 {
+
+	public function execute(AgaviRequestDataHolder $rd)
+	{
+		/**
+		 * @var Hub_GithubModel
+		 */
+		$model = $this->context->getModel('Package', 'Hub');
+
+		try {
+			$repo = $model->getRepo($rd->getParameter('user'), $rd->getParameter('repo'));
+		} catch (Exception $e) {
+			return $this->handleError($rd);
+		}
+
+		if (!$repo) {
+			return $this->handleError($rd);
+		}
+
+		$this->setAttribute('repo', $repo);
+
+		return 'Success';
+	}
+
 	/**
 	 * Returns the default view if the action does not serve the request
 	 * method used.

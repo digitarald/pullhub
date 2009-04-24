@@ -13,20 +13,10 @@
 			<?php include('html-globalrd.php'); ?>
 		</div>
 
+		<? if (isset($template['actions'])): ?>
 		<h2>Actions</h2>
 		<div id="adt-section-actions" >
 			<?php include('html-actions.php'); ?>
-		</div>
-
-		<h2>FPF</h2>
-		<div>
-			FormPopulationFilter TODO
-		</div>
-
-		<?php if ( AgaviConfig::get('core.use_database') ): ?>
-		<h2>Databases</h2>
-		<div>
-			Class name: <?php echo $template['database']['class_name']; ?>
 		</div>
 		<?php endif; ?>
 
@@ -143,5 +133,37 @@
 				<p>No log lines</p>
 			<?php endif;?>
 		</div>
+		
+		<?php if($template['datasources']) foreach($template['datasources'] as $datasource): ?>
+			<h2><?php echo htmlspecialchars($datasource->getName()); ?></h2>
+			<div>
+				<?php if ($datasource->getDataType() == AdtDebugFilterDataSource::TYPE_KEYVALUE): ?>
+					<?php foreach($datasource->getData() as $key => $value):
+						echo htmlspecialchars($key); ?>: <?php echo htmlspecialchars($value); ?><br/>
+					<?php endforeach;
+				elseif ($datasource->getDataType() == AdtDebugFilterDataSource::TYPE_LINEAR):
+					foreach($datasource->getData() as $line):
+						echo htmlspecialchars($line); ?><br/>
+					<?php endforeach;
+				elseif ($datasource->getDataType() == AdtDebugFilterDataSource::TYPE_TABULAR):
+					$table = $datasource->getData(); ?>
+					<table>
+						<tr>
+						<?php foreach($table['headers'] as $value): ?>
+							<th><?php echo htmlspecialchars($value); ?></th>
+						<?php endforeach;?>
+						</tr>
+						<?php foreach($table['rows'] as $row): ?>
+						<tr>
+							<?php foreach($row as $value): ?>
+								<td><?php echo htmlspecialchars($value); ?></td>
+							<?php endforeach;?>
+						</tr>
+						<?php endforeach;?>
+					</table>
+				<?php endif; ?>
+			</div>
+		<?php endforeach; ?>
+		
 	</div><!-- sections / tabs -->
 </div>

@@ -3,8 +3,8 @@
 /**
  * AdtRequestLogAppender is a simple logger appender
  * that stores the log lines in AgaviRequest
- *
- * It was built to be used with AdtDebugFilter and its descendants
+ * 
+ * It was built to be used with AdtDebugFilter and its descendants 
  * that can render the log.
  *
  */
@@ -16,19 +16,17 @@ class AdtRequestLogAppender extends AgaviLoggerAppender
 		if(($layout = $this->getLayout()) === null) {
 			throw new AgaviLoggingException('No Layout set');
 		}
-
 		$this->context->getRequest()->appendAttribute(
 			'log',
 			array(
-				'timestamp' => new DateTime(),
-				'microtime' => microtime(true),
+				'microtime' => microtime(true), 
 				'message' => $this->getLayout()->format($message)
 			),
-			'adt.debugtoolbar'
+			AdtDebugFilter::NS_DATA
 		);
 	}
-
-	public function shutdown()
+	
+	public function shutdown() 
 	{
 		//
 	}

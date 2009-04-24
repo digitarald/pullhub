@@ -6,7 +6,12 @@
 >
 	<ae:configuration>
 		
-		<validators>
+		<validators method="read">
+		
+			<validator class="isset" required="false">
+				<argument>user</argument>
+			</validator>
+			
 		</validators>
 		
 	</ae:configuration>

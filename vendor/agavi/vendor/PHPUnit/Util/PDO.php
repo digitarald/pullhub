@@ -104,7 +104,7 @@ class PHPUnit_Util_PDO
                             break;
 
                         case 'user':
-                        case 'username':
+                        case 'owner':
                             $user = $val;
                             break;
 
@@ -206,7 +206,7 @@ class PHPUnit_Util_PDO
         $parsed = array(
             'phptype'  => FALSE,
             'dbsyntax' => FALSE,
-            'username' => FALSE,
+            'owner' => FALSE,
             'password' => FALSE,
             'protocol' => FALSE,
             'hostspec' => FALSE,
@@ -263,12 +263,12 @@ class PHPUnit_Util_PDO
             $dsn = substr( $dsn, $at + 1 );
             if ( ( $pos = strpos( $str, ':' ) ) !== FALSE )
             {
-                $parsed['username'] = rawurldecode( substr( $str, 0, $pos ) );
+                $parsed['owner'] = rawurldecode( substr( $str, 0, $pos ) );
                 $parsed['password'] = rawurldecode( substr( $str, $pos + 1 ) );
             }
             else
             {
-                $parsed['username'] = rawurldecode( $str );
+                $parsed['owner'] = rawurldecode( $str );
             }
         }
 

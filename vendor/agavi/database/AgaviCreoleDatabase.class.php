@@ -176,7 +176,7 @@ class AgaviCreoleDatabase extends AgaviDatabase
 		if($dsn == null) {
 
 			// list of available parameters
-			$available = array('database', 'hostspec', 'password', 'phptype', 'username');
+			$available = array('database', 'hostspec', 'password', 'phptype', 'owner');
 
 			$dsn = array();
 
