@@ -138,9 +138,9 @@ class Hub_GithubModel extends PullHubHubBaseModel
     return $this->retrieve('tree/show/%s/%s/%s', array($user, $repo, $sha), 'tree', true);
   }
 
-  public function showBlob($user, $repo, $sha, $path)
+  public function showBlob($user, $repo, $sha)
   {
-    return $this->retrieve('blob/show/%s/%s/%s/%s', array($user, $repo, $sha, $path), 'blob', true);
+    return $this->retrieve('blob/show/%s/%s/%s', array($user, $repo, $sha));
   }
 
 
@@ -211,8 +211,9 @@ class Hub_GithubModel extends PullHubHubBaseModel
       $tree[join('/', $leave['path']) ] = &$leave;
 
       if ($leave['name'] == 'manifest.yml') {
-        // sfYaml::load();
-        $repo['manifest'] = $this->showBlob($repo['owner'], $repo['name'], $repo['sha'], join('/', $leave['path']));
+        $repo['manifest'] = $this->showBlob($repo['owner'], $repo['name'], $leave['sha']);
+      } elseif ($leave['name'] == 'scripts.json') {
+        $repo['scripts'] = $this->showBlob($repo['owner'], $repo['name'], $leave['sha']);
       } elseif ($leave['type'] == 'tree') {
       	$tree = array_merge($tree, $this->expandTree($leave['sha'], $repo, $leave['path']));
       }
@@ -223,6 +224,21 @@ class Hub_GithubModel extends PullHubHubBaseModel
 
     return $tree;
   }
+
+	public function expandManifest(&$repo)
+	{
+		foreach ($repo['tree'] as $path => &$leave) {
+			if ($leave['type'] == 'tree' || $leave['nature'] != 'source') {
+				continue;
+			}
+
+			$leave['data'] = $this->showBlob($repo['owner'], $repo['name'], $leave['sha']);
+
+			if (preg_match('/^\\/\*+=(.*?)\n\*+\//s', $leave['data'], $m)) {
+				$leave['manifest'] = sfYaml::load(trim($m[1]));
+			}
+		}
+	}
 
 }
 

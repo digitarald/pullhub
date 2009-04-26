@@ -10,6 +10,8 @@ class Hub_PackageModel extends PullHubHubBaseModel
 
 	public function getRepos($user = null)
 	{
+		$results = array();
+
 		foreach (AgaviConfig::get('hub.user_alias', array()) as $alias => $root) {
 			if (!is_dir($root)) {
 				continue;
@@ -21,7 +23,7 @@ class Hub_PackageModel extends PullHubHubBaseModel
 
 			$model = $this->context->getModel('Folderhub', 'Hub', array('root' => $root, 'alias' => $alias));
 
-			$results = array_merge($results, $model->getRepos());
+			$results = $model->getRepos();
 		}
 
 		$model = $this->context->getModel('Github', 'Hub');
@@ -36,6 +38,8 @@ class Hub_PackageModel extends PullHubHubBaseModel
 	public function getRepo($user, $repo, $tree = null)
 	{
 		$alias = AgaviConfig::get('hub.user_alias', array());
+
+		$result = null;
 
 		if (key_exists($user, $alias)) {
 			$model = $this->context->getModel('Folderhub', 'Hub', array('root' => $alias[$user], 'alias' => $user));
@@ -112,6 +116,18 @@ class Hub_PackageModel extends PullHubHubBaseModel
 
 		if (isset($manifest['specs'])) {
 			$nature['specs'] = $this->translateMatch($manifest['specs']);
+		}
+
+		if (!isset($manifest['tests'])) {
+			if (isset($repo['tree']['Tests'])) {
+				$manifest['tests'] = 'Tests/*';
+			} elseif (isset($repo['tree']['Tests.js'])) {
+				$manifest['tests'] = 'Tests.js';
+			}
+		}
+
+		if (isset($manifest['tests'])) {
+			$nature['tests'] = $this->translateMatch($manifest['tests']);
 		}
 
 		if (!isset($manifest['demos'])) {
@@ -191,7 +207,7 @@ class Hub_PackageModel extends PullHubHubBaseModel
 				$bit = preg_quote($bit, '/');
 			}
 
-			$path = '(^|\\/)' . join('.*', $path) . '((\.[a-z0-9]{2,4})?$|\\/)';
+			$path = '^(\w+\\/)?' . join('.*', $path) . '((\.[a-z0-9]{2,4})?$|\\/)';
 		}
 		unset($path);
 

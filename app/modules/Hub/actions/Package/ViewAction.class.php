@@ -13,6 +13,7 @@ class Hub_Package_ViewAction extends PullHubHubBaseAction
 		try {
 			$repo = $model->getRepo($rd->getParameter('user'), $rd->getParameter('repo'));
 		} catch (Exception $e) {
+			throw $e;
 			return $this->handleError($rd);
 		}
 
