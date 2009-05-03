@@ -9,32 +9,70 @@ var pullhub = {
 		var tree = $('tree');
 		if (!tree) return;
 		
-		var files = new Hash();
+		var sources = new Hash();
+		var assets = new Hash();
 		
 		tree.getElements('label.nature-source').each(function(file) {
 			var manifest = file.getElement('input[type=hidden]');
+			
 			if (manifest && (manifest = JSON.decode(manifest.value, false))) {
-				file.addEvent('checked', function() {
-					if (!manifest.require_regex) return;
-					console.log(manifest.require_regex);
-					var test = new RegExp(manifest.require);
-					files.each(function(label, path) {
-						console.log(path, test.test(path));
-						if (test.test(path) && !label.hasClass('checked')) {
-							label.getElement('input[type=checkbox]').set('checked', true).fireEvent('click');
+				
+				if (manifest.require_regex) manifest.require_regex = new RegExp(manifest.require_regex);
+				if (manifest.provide_regex) manifest.provide_regex = new RegExp(manifest.provide_regex);
+				file.store('manifest', manifest);
+				
+				file.addEvent('check', function() {
+					if (manifest.require_regex) {
+						sources.each(function(label, path) {
+							if (manifest.require_regex.test(path) && !label.hasClass('checked')) {
+								label.getElement('input[type=checkbox]').set('checked', true).fireEvent('click');
+							}
+						});
+					}
+					if (manifest.provide_regex) {
+						assets.each(function(label, path) {
+							if (manifest.provide_regex.test(path) && !label.hasClass('checked')) {
+								label.getElement('input[type=checkbox]').set('checked', true).fireEvent('click');
+							}
+						});
+					}
+				});
+				
+				file.addEvent('uncheck', function() {
+					var path = file.title;
+					sources.each(function(label) {
+						var current = label.retrieve('manifest');
+						if (current && current.require_regex && current.require_regex.test(path) && label.hasClass('checked')) {
+							label.getElement('input[type=checkbox]').set('checked', false).fireEvent('click');
 						}
 					});
 				});
 			}
 			
-			files.set(file.title, file);
+			sources.set(file.title, file);
 		});
+
+		tree.getElements('label.nature-assets').each(function(file) {
+
+			file.addEvent('uncheck', function() {
+				var path = file.title;
+				sources.each(function(label) {
+					var current = label.retrieve('manifest');
+					if (current && current.require_regex && current.require_regex.test(path) && label.hasClass('checked')) {
+						label.getElement('input[type=checkbox]').set('checked', false).fireEvent('click');
+					}
+				});
+			});
+			
+			assets.set(file.title, file);
+		});
+		
 				
 		tree.getElements('input[type=checkbox]').addEvent('click', function() {
 			var checked = this.checked;
 			var toggle = (checked) ? 'addClass' : 'removeClass';
 			
-			this.stack = this.getParent()[toggle]('checked')
+			var stack = this.getParent()[toggle]('checked')
 				.getParent().highlight()
 				.getElements('input[type=checkbox]')
 				.filter(function(box) {
@@ -43,10 +81,10 @@ var pullhub = {
 				.set('checked', checked)
 				.getParent()[toggle]('checked');
 			
-			this.stack.push(this.getParent());
+			stack.push(this.getParent());
 						
-			if (checked) this.stack.fireEvent('checked');
-		});
+			stack.fireEvent((checked) ? 'check' : 'uncheck');
+		}).set('checked', false);
 	}
 
 };

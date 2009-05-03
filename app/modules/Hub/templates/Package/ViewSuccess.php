@@ -23,7 +23,7 @@
 
 				<?php if (isset($leave['manifest'])): ?>
 				<input type="hidden" value="<?= str_replace('"', "'", json_encode($leave['manifest'])) ?>" />
-				<span class="small"><?= $leave['manifest']['description'] ?></span>
+				<span class="small quiet"><?= $leave['manifest']['description'] ?></span>
 				<?php endif; ?>
 
 			</label>
@@ -44,4 +44,5 @@
 		<dd><?= is_array($value) ? print_r($value, true) : $value ?></dd>
 	<?php endforeach; ?>
 	</dl>
+
 </div>

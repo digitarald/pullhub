@@ -82,8 +82,12 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 				continue;
 			}
 
-			if (!isset($repo['manifest']) && $filename == 'manifest.yml') {
+			if ($filename == 'manifest.yml' && !isset($repo['manifest'])) {
 				$repo['manifest'] = sfYaml::load($file->__toString());
+			}
+
+			if ($filename == 'scripts.json' && !isset($repo['scripts'])) {
+				$repo['scripts'] = json_decode(file_get_contents($file->__toString()), true);
 			}
 
 			$depth = $read->getDepth();

@@ -65,7 +65,38 @@ class Hub_PackageModel extends PullHubHubBaseModel
 
 		$model->expandManifest($result);
 
+		// scripts.json => manifest
+		$convert = array();
+
+		if (isset($result['scripts']) && is_array($result['scripts'])) {
+
+			foreach ($result['scripts'] as $parent => $scripts) {
+				foreach ($scripts as $script_name => $script_manifest) {
+					$convert[$parent . '/' . $script_name . '.js'] = array(
+						'require' => $script_manifest['deps'],
+						'description' => $script_manifest['desc']
+					);
+				}
+			}
+		}
+
+
 		foreach ($result['tree'] as $path => &$file) {
+			if ($file['nature'] != 'source') {
+				continue;
+			}
+
+			if (count($convert)) {
+
+				foreach ($convert as $convert_path => $convert_manifest) {
+					if (strpos($path, $convert_path) !== false) {
+						$file['manifest'] = $convert_manifest;
+						break;
+					}
+				}
+
+			}
+
 			if (!isset($file['manifest'])) {
 				continue;
 			}
@@ -211,7 +242,7 @@ class Hub_PackageModel extends PullHubHubBaseModel
 				$bit = preg_quote($bit, '/');
 			}
 
-			$path = '^(\w+\\/)?' . join('.*', $path) . '((\.[a-z0-9]{2,4})?$|\\/)';
+			$path = '^(\w+\\/){0,2}' . join('.*', $path) . '(\.[a-z0-9]{2,4})?$';
 		}
 		unset($path);
 
