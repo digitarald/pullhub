@@ -5,6 +5,7 @@ class Hub_GithubModel extends PullHubHubBaseModel
 
   protected $api = 'http://github.com/api/v2/json/';
 
+  protected $downloadUrl = 'http://github.com/%s/%s/zipball/%s';
 
   protected $login = null;
 
@@ -43,8 +44,6 @@ class Hub_GithubModel extends PullHubHubBaseModel
 
     curl_close($handle);
 
-    sleep(1); // simple protection (max 60 requests/min)
-
     return $content;
   }
 
@@ -67,6 +66,8 @@ class Hub_GithubModel extends PullHubHubBaseModel
     }
 
     $raw = $this->fetchURL($this->api . str_replace('%2F', '/', $path));
+
+    sleep(1); // simple protection (max 60 requests/min)
 
     if ($reduce !== null) {
       $raw = json_decode($raw, true);
@@ -132,7 +133,6 @@ class Hub_GithubModel extends PullHubHubBaseModel
     return $this->retrieve('repos/show/%s/%s/branches', array($user, $repo), 'branches', true);
   }
 
-
   public function showTree($user, $repo, $sha)
   {
     return $this->retrieve('tree/show/%s/%s/%s', array($user, $repo, $sha), 'tree', true);
@@ -141,6 +141,12 @@ class Hub_GithubModel extends PullHubHubBaseModel
   public function showBlob($user, $repo, $sha)
   {
     return $this->retrieve('blob/show/%s/%s/%s', array($user, $repo, $sha));
+  }
+
+
+  public function listCommits($user, $repo, $sha)
+  {
+    return $this->retrieve('commits/list/%s/%s/%s', array($user, $repo, $sha), 'commits', true);
   }
 
 
@@ -186,12 +192,50 @@ class Hub_GithubModel extends PullHubHubBaseModel
       throw new Exception('Chosen tree does not exist');
     }
 
+    $repo['branch'] = $tree;
     $repo['sha'] = $stack[$tree];
 
-    $repo['tree'] = $this->expandTree($repo['sha'], $repo);
+    $repo['commits'] = $this->listCommits($repo['owner'], $repo['name'], $repo['sha']);
+
+    $last = $repo['commits_last'] = $repo['commits'][0];
+
+    $folder = AgaviConfig::get('hub.extract_dir') . '/' . $repo['owner'] . '-' . $repo['name'] . '-' . $repo['sha'];
+
+    $fetch = true;
+
+    if (is_dir($folder) && strtotime($last['authored_date']) < filemtime($folder)) {
+    	$fetch = false;
+    	// touch($folder);
+    } else {
+	    if (is_dir($folder)) {
+	    	rmdir($folder);
+	    }
+
+    	$zip_data = $this->fetchURL(sprintf($this->downloadUrl, $repo['owner'], $repo['name'], $repo['branch']));
+
+    	$zip_file = $folder . '.zip';
+    	file_put_contents($zip_file, $zip_data);
+
+    	$handle = new ZipArchive();
+    	if (!$handle->open($zip_file)) {
+    		new Exception('Extracting the github archive failed');
+    	}
+
+	    $handle->extractTo(AgaviConfig::get('hub.extract_dir'));
+	    $handle->close();
+
+	    unlink($zip_file);
+    	// touch($folder);
+    }
+
+    $repo['path'] = $folder;
+
+    // $repo['tree'] = $this->expandTree($repo['sha'], $repo);
 
     return $repo;
   }
+
+  /* All local on extracted directory
 
   protected function expandTree($sha, &$repo, $path = array())
   {
@@ -240,6 +284,7 @@ class Hub_GithubModel extends PullHubHubBaseModel
 		}
 	}
 
+	*/
 }
 
 ?>

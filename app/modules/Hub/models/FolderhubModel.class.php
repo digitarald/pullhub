@@ -20,21 +20,6 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 		$this->root = $parameters['root'];
 	}
 
-	public function isRepo($repo)
-	{
-		$path = $this->root . '/' . $repo;
-
-		if (!is_dir($path)) {
-			return false;
-		}
-
-		if (!is_readable($path . '/manifest.yml')) {
-			return false;
-		}
-
-		return true;
-	}
-
 	public function getRepos()
 	{
 		$results = array();
@@ -63,19 +48,18 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 
 	public function getRepo($name)
 	{
-		$found = false;
-
 		foreach ($this->getRepos() as $repo) {
 			if ($repo['name'] == $name) {
-				$found = true;
-				break;
+				$this->getTree($repo);
+				return $repo;
 			}
 		}
 
-		if (!$found) {
-			return null;
-		}
+		return null;
+	}
 
+	public function getTree(&$repo)
+	{
 		$read = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($repo['path']), RecursiveIteratorIterator::SELF_FIRST);
 
 		$tree = array();
@@ -85,17 +69,21 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 		foreach ($read as $file) {
 			$depth = $read->getDepth();
 
-			$filename = $file->getFilename();
-
 			if ($depth - 1 > $last_depth) {
 				continue;
 			}
+
+			$filename = $file->getFilename();
 
 			$is_dir = $file->isDir();
 			$size = $file->getSize();
 
 			if (substr($filename, 0, 1) == '.' || (!$is_dir && !$size)) {
 				continue;
+			}
+
+			if (!isset($repo['manifest']) && $filename == 'manifest.yml') {
+				$repo['manifest'] = sfYaml::load($file->__toString());
 			}
 
 			$depth = $read->getDepth();
@@ -123,8 +111,6 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 		}
 
 		$repo['tree'] = $tree;
-
-		return $repo;
 	}
 
 	public function expandManifest(&$repo)

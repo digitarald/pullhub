@@ -36,6 +36,8 @@ AgaviConfig::set('hub.package_alias', array(
 	'more' => 'mootools/mootools-more'
 ));
 
+AgaviConfig::set('hub.extract_dir', AgaviConfig::get('core.project_dir') . '/pulled');
+
 
 // Report all errors during development
 error_reporting(E_ALL);

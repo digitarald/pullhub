@@ -51,10 +51,14 @@ class Hub_PackageModel extends PullHubHubBaseModel
 			$model = $this->context->getModel('Github', 'Hub');
 
 			$result = $model->getRepo($user, $repo, $tree);
-		}
 
-		if (!$result) {
-			return null;
+			if (!$result) {
+				return null;
+			}
+
+			$model = $this->context->getModel('Folderhub', 'Hub', array('root' => $result['path'], 'alias' => $result['owner']));
+
+			$model->getTree($result);
 		}
 
 		$this->expandManifest($result);

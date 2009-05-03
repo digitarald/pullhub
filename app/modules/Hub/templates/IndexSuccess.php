@@ -2,9 +2,9 @@
 	<?php foreach ($repos as $repo): ?>
 	<li>
 		<div class="push-0">
-			<?php if (isset($repo['followers'])): ?>
+			<?php if (isset($repo['watchers'])): ?>
 			<span class="ss_sprite ss_arrow_divide" title="Forks"><?= $repo['forks'] ?></span>
-			<span class="ss_sprite ss_magnifier" title="Watchers"><?= $repo['followers'] ?></span>
+			<span class="ss_sprite ss_magnifier" title="Watchers"><?= $repo['watchers'] ?></span>
 			<?php endif; ?>
 		</div>
 		<h3>
