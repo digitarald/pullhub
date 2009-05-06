@@ -109,6 +109,7 @@ var pullhub = {
 				if (this.retrieve('timer')) return false;
 				
 				this.store('timer', (function() {
+					this.eliminate('timer');
 					this.toggleClass('closed');	
 					this.getNext('ul')[(this.hasClass('closed')) ? 'addClass' : 'removeClass']('hide');
 				}).delay(200, this));

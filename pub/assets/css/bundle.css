@@ -116,7 +116,7 @@ h3 a:hover {
 }
 .listview label.type-tree {
 	background-image: url(../images/type-tree-minus.png);
-	color: #696969;
+	color: #222;
 }
 .listview label.closed {
 	background-image: url(../images/type-tree-plus.png);

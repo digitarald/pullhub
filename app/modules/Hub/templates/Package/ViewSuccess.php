@@ -45,7 +45,7 @@
 
 <div class="span-7 last">
 	<h4>Manifest</h4>
-	<dl>
+	<dl class="quiet">
 	<?php foreach ($repo['manifest'] as $key => $value): ?>
 		<dt><?= $key ?></dt>
 		<dd><?= is_array($value) ? htmlspecialchars(print_r($value, true)) : htmlspecialchars($value) ?></dd>

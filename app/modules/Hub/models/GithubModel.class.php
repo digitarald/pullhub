@@ -232,6 +232,7 @@ class Hub_GithubModel extends PullHubHubBaseModel
 		    $handle->close();
     	} else {
     		exec(sprintf('unzip %s -d %s', $zip_file, AgaviConfig::get('hub.extract_dir')));
+    		touch($folder);
     	}
 
 	    $this->context->getLoggerManager()->log('Downloaded and unzipped ' . $this->downloadUrl . ' (' . filesize($zip_file) . ' Bytes)');
