@@ -3,7 +3,7 @@
 class Hub_Package_ViewAction extends PullHubHubBaseAction
 {
 
-	public function execute(AgaviRequestDataHolder $rd)
+	public function executeWrite(AgaviRequestDataHolder $rd)
 	{
 		/**
 		 * @var Hub_GithubModel
@@ -13,7 +13,28 @@ class Hub_Package_ViewAction extends PullHubHubBaseAction
 		try {
 			$repo = $model->getRepo($rd->getParameter('user'), $rd->getParameter('repo'));
 		} catch (Exception $e) {
-			throw $e;
+			return $this->handleError($rd);
+		}
+
+		if (!$repo) {
+			return $this->handleError($rd);
+		}
+
+		$this->setAttribute('repo', $repo);
+
+		return 'Success';
+	}
+
+	public function executeRead(AgaviRequestDataHolder $rd)
+	{
+		/**
+		 * @var Hub_GithubModel
+		 */
+		$model = $this->context->getModel('Package', 'Hub');
+
+		try {
+			$repo = $model->getRepo($rd->getParameter('user'), $rd->getParameter('repo'));
+		} catch (Exception $e) {
 			return $this->handleError($rd);
 		}
 

@@ -31,6 +31,10 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
     	$name = $file->getFilename();
 
 			if ($name == 'manifest.yml') {
+				if (file_exists($file->getPath() . '/.lock')) {
+					continue;
+				}
+
 				$result = array(
 					'path' => $file->getPath(),
 					'owner' => $this->alias,
@@ -82,17 +86,19 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 				continue;
 			}
 
-			if ($filename == 'manifest.yml' && !isset($repo['manifest'])) {
-				$repo['manifest'] = sfYaml::load($file->__toString());
-			}
-
-			if ($filename == 'scripts.json' && !isset($repo['scripts'])) {
-				$repo['scripts'] = json_decode(file_get_contents($file->__toString()), true);
-			}
-
 			$depth = $read->getDepth();
-
 			$path = array();
+
+			if ($depth <= 1) {
+				if ($filename == 'manifest.yml' && !isset($repo['manifest'])) {
+					$repo['manifest'] = sfYaml::load($file->__toString());
+				}
+
+				if ($filename == 'scripts.json' && !isset($repo['scripts'])) {
+					$repo['scripts'] = json_decode(file_get_contents($file->__toString()), true);
+				}
+			}
+
 			if ($depth) {
 				$path = explode('/', str_replace('\\', '/', $read->getSubPath()) );
 			}
@@ -105,9 +111,10 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 
 			$last_depth = $depth;
 
-			$tree[join('/', $path)] = array(
+			$tree[$repo['name'] . ':' . join('/', $path)] = array(
 				'name' => $filename,
-				'path' => $path,
+				'path' => join('/', $path),
+				'paths' => $path,
 				'size' => $size,
 				'depth' => $read->getDepth(),
 				'type' => $type
@@ -119,12 +126,12 @@ class Hub_FolderhubModel extends PullHubHubBaseModel
 
 	public function expandManifest(&$repo)
 	{
-		foreach ($repo['tree'] as $path => &$file) {
+		foreach ($repo['tree'] as &$file) {
 			if ($file['type'] == 'tree' || $file['nature'] != 'source') {
 				continue;
 			}
 
-			$file['data'] = file_get_contents($repo['path'] . '/' . $path);
+			$file['data'] = file_get_contents($repo['path'] . '/' . $file['path']);
 
 			if (preg_match('/^\\/\*+=(.*?)\n\*+\//s', $file['data'], $m)) {
 				$file['manifest'] = sfYaml::load(trim($m[1]));

@@ -13,18 +13,18 @@ html {
 	margin: 0;
 }
 
-#tree,
-#tree ul {
+.listview,
+.listview ul {
 	list-style: none;
 	margin: 0;
 }
 
-#tree label {
+.listview label {
 	font-weight: normal;
 	cursor: pointer;
 }
 
-#tree ul {
+.listview ul {
 	margin-left: 1.5em;
 }
 
@@ -58,37 +58,99 @@ h3 a:hover {
 }
 
 #header {
-	border-bottom: 1px solid #ddd;
 }
 #header h1, #header h2 {
 	line-height: 60px;
 }
 
-#tree .nature-source .title {
-	color: #8b0000;
+.repo-head {
+	margin-bottom: 1.5em;
 }
-#tree .nature-docs .title {
+.repo-head h3 {
+	display: inline;
+}
+.repo-head p.tagline {
+	display: inline;
+}
+
+.listview ul {
+	margin-left: 21px;
+}
+
+
+.listview label {
+	background-position: 4px 3px;
+	background-repeat: no-repeat;
+	position: relative;
+	-moz-border-radius: 2px;
+	background-color: #f5f5f5;
+	display: block;
+	border-bottom: 1px solid #fff;
+	padding: 2px 4px;
+}
+
+.listview label:hover, .listview label.hover {
+	background-color: #444;
+	color: #fff;
+}
+
+.listview label input {
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+}
+.listview label .title {
+	padding-left: 22px;
+}
+
+.listview .checked {
+	background-color: #e8e8e8;
+}
+.listview .checked .title {
+	font-weight: bold;
+}
+
+.listview .type-blob {
+	background-image: url(../images/nature-unknown.png);
+}
+.listview label.type-tree {
+	background-image: url(../images/type-tree-minus.png);
 	color: #696969;
 }
-#tree .nature-assets .title {
+.listview label.closed {
+	background-image: url(../images/type-tree-plus.png);
+}
+
+.listview .nature-source {
+	color: #8b0000;
+	background-image: url(../images/nature-source.png);
+}
+.listview .nature-docs {
+	background-image: url(../images/nature-docs.png);
+}
+.listview .nature-assets {
 	color: #808000;
+	background-image: url(../images/nature-assets.png);
 }
-#tree .nature-specs .title,
-#tree .nature-demos .title {
-	color: #4682b4;
+.listview .nature-specs {
+	background-image: url(../images/nature-specs.png);
 }
-#tree .nature-compatibility .title {
-	color: #a9a9a9;
+.listview .nature-tests {
+	background-image: url(../images/nature-tests.png);
 }
+.listview .nature-demos {
+	background-image: url(../images/nature-demos.png);
+}
+.listview .nature-compatibility {
+	background-image: url(../images/nature-compatibility.png);
+}
+
 
 #footer {
 	margin-top: 1.45em;
 	padding: 1.45em 0;
 	border-top: 1px solid #ddd;
-}
-
-.checked .title {
-	font-weight: bold;
 }
 
 #footer .container {

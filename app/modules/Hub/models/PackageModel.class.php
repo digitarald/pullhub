@@ -78,10 +78,10 @@ class Hub_PackageModel extends PullHubHubBaseModel
 					);
 				}
 			}
+
 		}
 
-
-		foreach ($result['tree'] as $path => &$file) {
+		foreach ($result['tree'] as &$file) {
 			if ($file['nature'] != 'source') {
 				continue;
 			}
@@ -89,13 +89,14 @@ class Hub_PackageModel extends PullHubHubBaseModel
 			if (count($convert)) {
 
 				foreach ($convert as $convert_path => $convert_manifest) {
-					if (strpos($path, $convert_path) !== false) {
+					if (strpos($file['path'], $convert_path) !== false) {
 						$file['manifest'] = $convert_manifest;
 						break;
 					}
 				}
 
 			}
+
 
 			if (!isset($file['manifest'])) {
 				continue;
@@ -132,7 +133,7 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		$nature = array();
 
 		if (!isset($manifest['source'])) {
-			if (isset($repo['tree']['Source'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Source'])) {
 				$manifest['source'] = 'Source/*.js';
 			} else {
 				$manifest['source'] = '*.js';
@@ -142,9 +143,9 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		$nature['source'] = $this->translateMatch($manifest['source']);
 
 		if (!isset($manifest['specs'])) {
-			if (isset($repo['tree']['Specs'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Specs'])) {
 				$manifest['specs'] = 'Specs/*';
-			} elseif (isset($repo['tree']['Specs.js'])) {
+			} elseif (isset($repo['tree'][$repo['name'] . ':Specs.js'])) {
 				$manifest['specs'] = 'Specs.js';
 			}
 		}
@@ -154,9 +155,9 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		}
 
 		if (!isset($manifest['tests'])) {
-			if (isset($repo['tree']['Tests'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Tests'])) {
 				$manifest['tests'] = 'Tests/*';
-			} elseif (isset($repo['tree']['Tests.js'])) {
+			} elseif (isset($repo['tree'][$repo['name'] . ':Tests.js'])) {
 				$manifest['tests'] = 'Tests.js';
 			}
 		}
@@ -166,11 +167,11 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		}
 
 		if (!isset($manifest['demos'])) {
-			if (isset($repo['tree']['Demos'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Demos'])) {
 				$manifest['demos'] = 'Demos/*';
-			} elseif (isset($repo['tree']['Demos.html'])) {
+			} elseif (isset($repo['tree'][$repo['name'] . ':Demos.html'])) {
 				$manifest['demos'] = 'Demos.html';
-			} elseif (isset($repo['tree']['Demos.js'])) {
+			} elseif (isset($repo['tree'][$repo['name'] . ':Demos.js'])) {
 				$manifest['demos'] = 'Demos.js';
 			}
 		}
@@ -180,9 +181,9 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		}
 
 		if (!isset($manifest['docs'])) {
-			if (isset($repo['tree']['Docs'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Docs'])) {
 				$manifest['docs'] = 'Docs/*';
-			} elseif (isset($repo['tree']['README'])) {
+			} elseif (isset($repo['tree'][$repo['name'] . ':README'])) {
 				$manifest['docs'] = 'README';
 			} else {
 				$manifest['docs'] = '*.md';
@@ -192,7 +193,7 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		$nature['docs'] = $this->translateMatch($manifest['docs']);
 
 		if (!isset($manifest['assets'])) {
-			if (isset($repo['tree']['Assets'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Assets'])) {
 				$manifest['assets'] = 'Assets/*';
 			} else {
 				$manifest['assets'] = '*.css, *.gif, *.png, *.jpg';
@@ -200,9 +201,9 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		}
 
 		if (!isset($manifest['compatibility'])) {
-			if (isset($repo['tree']['Compatibility'])) {
+			if (isset($repo['tree'][$repo['name'] . ':Compatibility'])) {
 				$manifest['compatibility'] = 'Compatibility/*.js';
-			} elseif (isset($repo['tree']['Compatibility.js'])) {
+			} elseif (isset($repo['tree'][$repo['name'] . ':Compatibility.js'])) {
 				$manifest['compatibility'] = 'Compatibility.js';
 			}
 		}
@@ -217,14 +218,21 @@ class Hub_PackageModel extends PullHubHubBaseModel
 		foreach ($repo['tree'] as $key => &$file) {
 			$file['nature'] = null;
 
-			foreach ($nature as $name => $preg) {
+			$matches = array();
 
-				if (!preg_match('/' . $preg . '/', $key)) {
+			foreach (array_reverse($nature, true) as $name => $preg) {
+
+				if (!preg_match('/' . $preg . '/', $key, $bits)) {
 					continue;
 				}
+				$last = array_pop($bits);
 
-				$file['nature'] = $name;
-				break;
+				$matches[substr_count($last, '/')] =  $name;
+			}
+
+			if (count($matches)) {
+				ksort($matches);
+				$file['nature'] = array_shift($matches);
 			}
 		}
 	}
@@ -242,7 +250,7 @@ class Hub_PackageModel extends PullHubHubBaseModel
 				$bit = preg_quote($bit, '/');
 			}
 
-			$path = '^(\w+\\/){0,2}' . join('.*', $path) . '(\.[a-z0-9]{2,4})?$';
+			$path = '(?:^|:)((?:\w+\\/)*)' . join('.*', $path) . '(?:\.[a-z0-9]{2,4})?$';
 		}
 		unset($path);
 

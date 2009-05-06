@@ -7,6 +7,7 @@
 		<autoload name="SmartyPants">%core.vendor_dir%/markdown/smartypants.php</autoload>
 			
 		<autoload name="AdtDebugFilter">%core.vendor_dir%/adt/filter/AdtDebugFilter.class.php</autoload>
+		<autoload name="AdtRequestLogAppender">%core.vendor_dir%/adt/logging/AdtRequestLogAppender.class.php</autoload>
 	 
 		<autoload name="AdtDebugToolbarFilter">%core.vendor_dir%/adt/filter/AdtDebugToolbarFilter.class.php</autoload>
 	 

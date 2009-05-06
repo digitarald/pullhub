@@ -201,14 +201,18 @@ class Hub_GithubModel extends PullHubHubBaseModel
 
     $folder = AgaviConfig::get('hub.extract_dir') . '/' . $repo['owner'] . '-' . $repo['name'] . '-' . $repo['sha'];
 
-    $fetch = true;
-
     if (is_dir($folder) && strtotime($last['authored_date']) < filemtime($folder)) {
-    	$fetch = false;
-    	// touch($folder);
+
+	    $this->context->getLoggerManager()->log('Skipped downloading ' . $repo['owner'] . '-' . $repo['name']);
+
+	    // touch($folder);
     } else {
-	    if (is_dir($folder)) {
-	    	rmdir($folder);
+
+    	if (is_dir($folder)) {
+	    	AgaviToolkit::clearCache($folder);
+	    	if (@rmdir($folder)) {
+	    		AgaviToolkit::mkdir($folder);
+	    	}
 	    }
 
     	$zip_data = $this->fetchURL(sprintf($this->downloadUrl, $repo['owner'], $repo['name'], $repo['branch']));
@@ -216,13 +220,21 @@ class Hub_GithubModel extends PullHubHubBaseModel
     	$zip_file = $folder . '.zip';
     	file_put_contents($zip_file, $zip_data);
 
-    	$handle = new ZipArchive();
-    	if (!$handle->open($zip_file)) {
-    		new Exception('Extracting the github archive failed');
+
+    	if (class_exists('ZipArchive')) {
+    		$handle = new ZipArchive();
+
+	    	if (!$handle->open($zip_file)) {
+	    		new Exception('Extracting the github archive failed');
+	    	}
+
+		    $handle->extractTo(AgaviConfig::get('hub.extract_dir'));
+		    $handle->close();
+    	} else {
+    		exec(sprintf('unzip %s -d %s', $zip_file, AgaviConfig::get('hub.extract_dir')));
     	}
 
-	    $handle->extractTo(AgaviConfig::get('hub.extract_dir'));
-	    $handle->close();
+	    $this->context->getLoggerManager()->log('Downloaded and unzipped ' . $this->downloadUrl . ' (' . filesize($zip_file) . ' Bytes)');
 
 	    unlink($zip_file);
     	// touch($folder);
